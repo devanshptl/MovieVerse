@@ -18,4 +18,5 @@ urlpatterns = [
     path("list/review/<int:pk>/", ReviewDetailsAV.as_view(), name="review_details"),
     path("user/<str:username>/", ReviewUser.as_view(), name="ReviewUser"),
     path("likes/", LikedReviewsView.as_view(), name="likes"),
+    path("recommendations/", RecommendedMoviesView.as_view(), name="recommandations"),
 ]
