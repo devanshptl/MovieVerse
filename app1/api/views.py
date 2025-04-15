@@ -6,6 +6,7 @@ from app1.api.paginations import *
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import *
@@ -204,19 +205,37 @@ class TrendingShowsView(APIView):
         # Aggregate trending data
         trending_data = (
             Review.objects.filter(like=True)
-            .values('watchlist__title')  # this will be the dictionary key
+            .values('watchlist__title')  
             .annotate(like_count=Count('id'))
             .order_by('-like_count')[:5]
         )
         
-        # Convert 'watchlist__title' key to 'title' for consistency with the serializer
         trending_data = [
             {'title': item['watchlist__title'], 'like_count': item['like_count']}
             for item in trending_data
         ]
         
-        # Serialize the data
         serializer = TrendingShowSerializer(trending_data, many=True)
         
-        # Return response
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def follow_platform(request):
+    user = request.user
+
+    if request.method == 'POST':
+        serializer = UserFollowPlatformSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user_follow = serializer.save()
+            return Response(
+                {"message": "Platform followed successfully" if user_follow else "Platform follow status updated"},
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'GET':
+        followed_platforms = UserFollowPlatform.objects.filter(user=user, is_following=True)
+        serializer = FollowedPlatformSerializer(followed_platforms, many=True)
+        return Response(serializer.data)
+

@@ -55,3 +55,36 @@ class LikeSerializers(serializers.ModelSerializer):
 class TrendingShowSerializer(serializers.Serializer):
     title = serializers.CharField()
     like_count = serializers.IntegerField()
+    
+    
+class UserFollowPlatformSerializer(serializers.ModelSerializer):
+    platform_name = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = UserFollowPlatform
+        fields = ['platform_name', 'is_following']
+
+    def create(self, validated_data):
+        platform_name = validated_data.get('platform_name')
+        platform = StreamingPlatform.objects.get(name=platform_name)
+        user = self.context['request'].user  
+        
+        user_follow = UserFollowPlatform.objects.filter(user=user, platform=platform).first()
+        
+        if user_follow:
+            user_follow.is_following = validated_data.get('is_following', False)
+            user_follow.save()
+        else:
+            user_follow = UserFollowPlatform.objects.create(
+                user=user,
+                platform=platform,
+                is_following=validated_data.get('is_following', False)
+            )
+        return user_follow
+    
+class FollowedPlatformSerializer(serializers.ModelSerializer):
+    platform_name = serializers.CharField(source='platform')
+    
+    class Meta:
+        model = UserFollowPlatform
+        fields = ['platform_name', 'is_following']

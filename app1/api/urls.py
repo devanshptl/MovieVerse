@@ -20,4 +20,6 @@ urlpatterns = [
     path("likes/", LikedReviewsView.as_view(), name="likes"),
     path("recommendations/", RecommendedMoviesView.as_view(), name="recommandations"),
     path('trending', TrendingShowsView.as_view(), name="treding"),
+    path('follow-platform/', follow_platform, name='follow-platform'),
+    path('get-follow-platform/', follow_platform, name='follow-platform'),
 ]
