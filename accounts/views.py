@@ -8,27 +8,37 @@ from accounts import models
 
 # Create your views here.
 
-@api_view(['POST',])
+
+@api_view(
+    [
+        "POST",
+    ]
+)
 def user_registartion(request):
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         serializer = UserSerializers(data=request.data)
         data = {}
         if serializer.is_valid():
             info = serializer.save()
-            data['Responce'] = "User registration successfull"
-            data['username'] = info.username
-            data['email'] = info.email       
-            
-            token = Token.objects.get(user = info).key
-            data['token'] = token
+            data["Responce"] = "User registration successfull"
+            data["username"] = info.username
+            data["email"] = info.email
+
+            token = Token.objects.get(user=info).key
+            data["token"] = token
         else:
             serializer.errors
-        return Response(data, status=status.HTTP_201_CREATED)  
-    
-@api_view(['POST',])
+        return Response(data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(
+    [
+        "POST",
+    ]
+)
 def logout_user(request):
     request.user.auth_token.delete()
     return Response(status=status.HTTP_200_OK)
-        
-        
