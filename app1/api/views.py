@@ -11,8 +11,7 @@ from rest_framework import generics
 from rest_framework.permissions import *
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework import filters
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from django.db.models import Count
 
 
 # Create your views here.
@@ -199,3 +198,25 @@ class RecommendedMoviesView(APIView):
         serialized = WatchSerializers(top_5_movies, many=True)
 
         return Response(serialized.data)
+    
+class TrendingShowsView(APIView):
+    def get(self, request):
+        # Aggregate trending data
+        trending_data = (
+            Review.objects.filter(like=True)
+            .values('watchlist__title')  # this will be the dictionary key
+            .annotate(like_count=Count('id'))
+            .order_by('-like_count')[:5]
+        )
+        
+        # Convert 'watchlist__title' key to 'title' for consistency with the serializer
+        trending_data = [
+            {'title': item['watchlist__title'], 'like_count': item['like_count']}
+            for item in trending_data
+        ]
+        
+        # Serialize the data
+        serializer = TrendingShowSerializer(trending_data, many=True)
+        
+        # Return response
+        return Response(serializer.data, status=status.HTTP_200_OK)

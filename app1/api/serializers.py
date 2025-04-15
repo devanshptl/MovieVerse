@@ -51,3 +51,7 @@ class LikeSerializers(serializers.ModelSerializer):
 
     def get_watchlist(self, obj):
         return obj.watchlist.title
+    
+class TrendingShowSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    like_count = serializers.IntegerField()
