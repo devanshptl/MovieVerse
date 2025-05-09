@@ -32,13 +32,6 @@ MovieVerse is an API built using **Django Rest Framework (DRF)**, offering a ran
     - Users can follow different platforms and receive notifications when new content is added. 
     - **Data-driven notifications** are sent based on user preferences and the platforms they follow.
 
-## Integration of Scikit-Learn & Pandas
-
-- **Data Processing**: Using **pandas** for manipulating movie, series, and review datasets to efficiently extract features such as average ratings, review counts, and tags.
-  
-- **Machine Learning**: **Scikit-learn** is used to build models for recommendation systems, where movies are recommended based on the tags of liked content.
-    - Techniques like **k-NN (k-nearest neighbors)** and **cosine similarity** are implemented to measure similarity between movies.
-    - **Clustering** techniques (e.g., **K-means**) are used for categorizing movies into clusters based on user preferences, which helps in personalizing recommendations.
 
 ## Security and Performance
 
